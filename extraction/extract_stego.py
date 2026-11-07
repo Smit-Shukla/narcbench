@@ -104,6 +104,10 @@ def load_blackjack_runs(runs_dir: Path) -> list[dict]:
         private_responses = parse_msgs(private_msgs)
         thinking_responses = parse_msgs(thinking_msgs)
         public_responses = parse_msgs(public_msgs)
+        # generation/stego.py stores final-hand replies in final_texts (keyed by
+        # agent), not public_messages, even though their prompts are logged with
+        # channel "public". Without this, every final-phase response is "".
+        final_texts = results.get("final_texts", {})
 
         # Walk prompts and match to responses in order
         priv_idx = 0
@@ -128,6 +132,11 @@ def load_blackjack_runs(runs_dir: Path) -> list[dict]:
                     think_idx += 1
                 else:
                     response = ""
+            elif channel == "public" and phase == "final":
+                if agent_name not in final_texts:
+                    raise KeyError(
+                        f"{run_id}: no final_texts entry for {agent_name}")
+                response = final_texts[agent_name]
             elif channel == "public":
                 if pub_idx < len(public_responses):
                     response = public_responses[pub_idx]
