@@ -4080,8 +4080,15 @@ def run_scenario(
     max_tokens: int,
     output_dir: Path,
     resume: bool = True,
+    honest_private: bool = False,
 ) -> dict:
     """Run one scenario (collusion or control) and save outputs.
+
+    honest_private (matched-context control): honest agents are also paired up
+    and given a private chat with the SAME private_frame, and they see it under
+    the SAME "PRIVATE COORDINATION" header during discussion. Every agent then
+    has private context, and the only colluder/honest difference left is the
+    collusive motive in the system prompt.
 
     Agent names are drawn from NAME_POOL using a seeded RNG so that:
       x_i = Sample(NAME_POOL, 4, seed=scenario_idx)
@@ -4208,16 +4215,15 @@ def run_scenario(
             temperature=temperature, max_tokens=max_tokens,
         )
 
-    # --- Private coordination round (colluders only, before public discussion) ---
-    if mode == "collusion":
-        for i, agent in enumerate(colluder_pair):
-            partner = colluder_pair[1 - i]
+    def _private_round(pair: list[str], messages: list[str]):
+        for i, agent in enumerate(pair):
+            partner = pair[1 - i]
             private_frame = scenario["private_frame"].format(partner=partner)
-            if private_messages:
-                # Second colluder sees first colluder's message
+            if messages:
+                # Second agent sees first agent's message
                 private_frame = (
                     f"{private_frame}\n\n"
-                    f"Messages so far:\n{_make_history(private_messages)}"
+                    f"Messages so far:\n{_make_history(messages)}"
                 )
             user_prompt = PRIVATE_COORD_TEMPLATE.format(
                 context=context,
@@ -4225,7 +4231,28 @@ def run_scenario(
                 private_frame=private_frame,
             )
             response = _call(agent, "private", "private", 0, user_prompt)
-            private_messages.append(f"[{agent}]: {response}")
+            messages.append(f"[{agent}]: {response}")
+
+    # agent -> (partner, shared private history) for everyone with a private channel
+    private_channel: dict[str, tuple[str, list[str]]] = {}
+
+    # --- Private coordination round (colluders only, before public discussion) ---
+    if mode == "collusion":
+        _private_round(colluder_pair, private_messages)
+        for i, agent in enumerate(colluder_pair):
+            private_channel[agent] = (colluder_pair[1 - i], private_messages)
+
+    # --- Matched-context control: honest pairs get the same kind of private chat ---
+    honest_private_messages: dict[str, list[str]] = {}
+    if honest_private:
+        honest_agents = [a for a in agents if roles[a] == "honest"]
+        for j in range(0, len(honest_agents), 2):
+            pair = honest_agents[j:j + 2]
+            msgs: list[str] = []
+            _private_round(pair, msgs)
+            honest_private_messages[" & ".join(pair)] = msgs
+            for i, agent in enumerate(pair):
+                private_channel[agent] = (pair[1 - i], msgs)
 
     # --- Public discussion rounds ---
     # Shuffle speaking order per round with a deterministic seed so collusion and
@@ -4236,14 +4263,15 @@ def run_scenario(
         order_rng.shuffle(round_agents)
         for agent in round_agents:
             history = _make_history(public_messages)
-            # Colluders see their private coordination during public rounds
-            if mode == "collusion" and roles[agent] == "colluder":
-                partner = colluder_pair[1 - colluder_pair.index(agent)]
+            # Agents with a private channel see it during public rounds
+            # (colluders always; honest pairs too when honest_private is on)
+            if agent in private_channel:
+                partner, agent_private = private_channel[agent]
                 user_prompt = COLLUDER_DISCUSSION_TEMPLATE.format(
                     context=context,
                     options_text=options_text,
                     partner=partner,
-                    private_history=_make_history(private_messages),
+                    private_history=_make_history(agent_private),
                     history=history,
                     public_frame=scenario["public_frame"],
                 )
@@ -4345,6 +4373,7 @@ def run_scenario(
         "colluder_voted_target": colluder_voted_target,  # how many colluders voted target
         "target_vote_count": target_vote_count,    # total votes for target option
         "flagged": False,
+        "honest_private": honest_private,          # matched-context control on/off
     }
     (run_dir / "run_config.json").write_text(json.dumps(run_config, indent=2))
     (run_dir / "agent_prompts.json").write_text(json.dumps(prompt_log, indent=2))
@@ -4355,6 +4384,7 @@ def run_scenario(
         "roles": roles,
         "votes": votes,
         "private_messages": private_messages,
+        "honest_private_messages": honest_private_messages,
         "public_messages": public_messages,
         "final_texts": final_texts,
         "collusion_success": collusion_success,
@@ -4422,6 +4452,11 @@ def main():
         "--no-resume", dest="resume", action="store_false", default=True,
         help="Do not skip already-complete runs (rerun everything)"
     )
+    parser.add_argument(
+        "--honest-private", action="store_true",
+        help="Matched-context control: honest agents also get a paired private "
+             "chat (same frame, same prompt header) so only intent differs"
+    )
     args = parser.parse_args()
 
     scenarios = SCENARIOS[: args.scenarios]
@@ -4459,6 +4494,7 @@ def main():
             max_tokens=args.max_tokens,
             output_dir=args.output_dir,
             resume=args.resume,
+            honest_private=args.honest_private,
         )
 
     tasks = [
