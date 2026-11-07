@@ -20,6 +20,16 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "extraction"))
 
+# AWQ models load through gptqmodel. Some of its modules compute constants at
+# import time, which fails if first imported while transformers builds the model
+# on the "meta" device. Import them up front, on CPU.
+try:
+    import gptqmodel  # noqa: F401
+    import gptqmodel.models.loader  # noqa: F401
+    import gptqmodel.nn_modules.exllamav3_torch  # noqa: F401
+except ImportError:
+    pass
+
 _orig = transformers.AutoModelForCausalLM.from_pretrained
 
 
