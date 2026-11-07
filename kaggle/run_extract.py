@@ -40,23 +40,27 @@ transformers.AutoModelForCausalLM.from_pretrained = _fp16
 def main():
     which, rest = sys.argv[1], sys.argv[2:]
     bug = "--stego-bug" in rest
-    rest = [a for a in rest if a != "--stego-bug"]
+    final_only = "--final-only" in rest
+    rest = [a for a in rest if a not in ("--stego-bug", "--final-only")]
 
     if which == "core":
         import extract_core as mod
     elif which == "stego":
         import extract_stego as mod
-        if bug:
+        if bug or final_only:
             original_loader = mod.load_blackjack_runs
 
-            def buggy_loader(runs_dir):
+            def wrapped_loader(runs_dir):
+                # final phase is the only phase the paper scores Stego on
                 samples = [s for s in original_loader(runs_dir) if s["phase"] == "final"]
-                for s in samples:
-                    s["response"] = ""
-                print(f"[--stego-bug] kept {len(samples)} final-phase samples, replies blanked")
+                if bug:
+                    for s in samples:
+                        s["response"] = ""
+                print(f"[run_extract] kept {len(samples)} final-phase samples"
+                      + (", replies blanked (--stego-bug)" if bug else ""))
                 return samples
 
-            mod.load_blackjack_runs = buggy_loader
+            mod.load_blackjack_runs = wrapped_loader
     else:
         sys.exit(f"unknown script: {which}")
 
