@@ -63,7 +63,7 @@ Run-level AUROC, mean of 5 methods:
 | Matched probe, held-out Core-matched | 0.999 |
 | Matched probe → Stego, fixed | 0.724 |
 
-Mean probe projection per agent group (Core-trained probe): colluders +12.8 on matched data; honest agents −13.4 on original Core vs **−3.1 on matched Core**. A harmless private chat moves honest agents most of the way toward the colluder side, though separation remains.
+Mean probe projection per agent group (Core-trained probe): colluders +12.8 on matched data; honest agents −13.4 on original Core vs **−3.1 on matched Core**. A harmless private chat raises honest agents' scores substantially (about 40% of the gap to colluders), though separation remains.
 
 **Limits:** one 8B model, one generation run (no repeat with new generation seeds), 20 scenario pairs; the Transfer tier was not generated.
 
