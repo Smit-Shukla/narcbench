@@ -1,5 +1,7 @@
 # NARCBench
 
+> **Fork note:** this fork contains an audit of the benchmark (a Stego extraction bug fix, a prompt-length baseline, a matched-context control, and a Qwen3-8B pilot). See [FINDINGS.md](FINDINGS.md).
+
 Code and data for **Detecting Multi-Agent Collusion Through Multi-Agent Interpretability**.
 
 NARCBench is a three-tier benchmark for evaluating multi-agent collusion detection under environment distribution shift. A linear deception probe is trained on committee-deliberation activations (Core) and evaluated zero-shot on structurally novel scenarios (Transfer) and steganographic signalling (Stego).

@@ -1,0 +1,26 @@
+core              0.42        -0.03            0.29
+transfer          0.12         0.16            0.00
+stego             0.48        -0.13            0.21
+
+3b. Full pipeline, original vs length-removed (10 seeds x 5 layers)
+  running original...
+  running length-removed...
+
+mean AUROC over 5 methods     original  length removed
+Held-out (Core)                  1.000           1.000
+Transfer                         0.802           0.804
+Stego                            1.000           0.985
+
+Held-out (Core) per method:
+  sorted_concat              1.000           1.000
+  activation_alignment       1.000           1.000
+  peak_suspicion             1.000           1.000
+  deception_split            1.000           1.000
+  asymmetry_probe            1.000           1.000
+
+Stego per method:
+  sorted_concat              1.000           0.983
+  activation_alignment       1.000           1.000
+  peak_suspicion             1.000           0.997
+  deception_split            0.999           0.956
+  asymmetry_probe            1.000           0.991

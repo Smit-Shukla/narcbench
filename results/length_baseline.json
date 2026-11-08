@@ -1,0 +1,122 @@
+[
+  {
+    "model": "qwen3_32b",
+    "tier": "core",
+    "phase": "discussion",
+    "agent_auroc": 0.8767343045438779,
+    "run_auroc": 0.8855359001040582,
+    "paper_probe_auroc": 1.0,
+    "n_collusion_runs": 31,
+    "n_control_runs": 31
+  },
+  {
+    "model": "qwen3_32b",
+    "tier": "transfer",
+    "phase": "final",
+    "agent_auroc": 0.5943287037037037,
+    "run_auroc": 0.7361111111111112,
+    "paper_probe_auroc": 0.78,
+    "n_collusion_runs": 36,
+    "n_control_runs": 36
+  },
+  {
+    "model": "qwen3_32b",
+    "tier": "stego",
+    "phase": "final",
+    "agent_auroc": 1.0,
+    "run_auroc": 1.0,
+    "paper_probe_auroc": 1.0,
+    "n_collusion_runs": 20,
+    "n_control_runs": 20
+  },
+  {
+    "model": "llama_3_1_70b",
+    "tier": "core",
+    "phase": "discussion",
+    "agent_auroc": 0.8515001734304544,
+    "run_auroc": 0.8428720083246619,
+    "paper_probe_auroc": 1.0,
+    "n_collusion_runs": 31,
+    "n_control_runs": 31
+  },
+  {
+    "model": "llama_3_1_70b",
+    "tier": "transfer",
+    "phase": "final",
+    "agent_auroc": 0.5046296296296297,
+    "run_auroc": 0.425925925925926,
+    "paper_probe_auroc": 0.87,
+    "n_collusion_runs": 36,
+    "n_control_runs": 36
+  },
+  {
+    "model": "llama_3_1_70b",
+    "tier": "stego",
+    "phase": "final",
+    "agent_auroc": 1.0,
+    "run_auroc": 1.0,
+    "paper_probe_auroc": 1.0,
+    "n_collusion_runs": 20,
+    "n_control_runs": 20
+  },
+  {
+    "model": "deepseek_r1_32b",
+    "tier": "core",
+    "phase": "discussion",
+    "agent_auroc": 0.8405080782312925,
+    "run_auroc": 0.8227040816326531,
+    "paper_probe_auroc": 1.0,
+    "n_collusion_runs": 28,
+    "n_control_runs": 28
+  },
+  {
+    "model": "deepseek_r1_32b",
+    "tier": "transfer",
+    "phase": "final",
+    "agent_auroc": 0.390817901234568,
+    "run_auroc": 0.33796296296296297,
+    "paper_probe_auroc": 0.75,
+    "n_collusion_runs": 36,
+    "n_control_runs": 36
+  },
+  {
+    "model": "deepseek_r1_32b",
+    "tier": "stego",
+    "phase": "final",
+    "agent_auroc": 1.0,
+    "run_auroc": 1.0,
+    "paper_probe_auroc": 0.92,
+    "n_collusion_runs": 20,
+    "n_control_runs": 20
+  },
+  {
+    "model": "gpt_oss_20b",
+    "tier": "core",
+    "phase": "discussion",
+    "agent_auroc": 0.7955246913580247,
+    "run_auroc": 0.7870370370370371,
+    "paper_probe_auroc": 1.0,
+    "n_collusion_runs": 18,
+    "n_control_runs": 18
+  },
+  {
+    "model": "gpt_oss_20b",
+    "tier": "transfer",
+    "phase": "final",
+    "agent_auroc": 0.3881172839506173,
+    "run_auroc": 0.3981481481481482,
+    "paper_probe_auroc": 0.64,
+    "n_collusion_runs": 13,
+    "n_control_runs": 13
+  },
+  {
+    "model": "gpt_oss_20b",
+    "tier": "stego",
+    "phase": "final",
+    "agent_auroc": 0.9527083333333333,
+    "run_auroc": 0.8325,
+    "paper_probe_auroc": 0.71,
+    "n_collusion_runs": 20,
+    "n_control_runs": 20
+  }
+]
